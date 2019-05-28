@@ -19,7 +19,7 @@ const Home = () => (
 
       return (
         <div>
-          <h1>{data.allUsers.length}</h1>
+          <h1>{JSON.stringify(data.allUsers)}</h1>
         </div>
       );
     }}
