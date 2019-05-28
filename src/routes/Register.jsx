@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Input, Header, Button } from 'semantic-ui-react'
+import { Container, Input, Header, Button, Label } from 'semantic-ui-react'
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -7,6 +7,11 @@ const REGISTER = gql`
     mutation register($newUser: userInput!) {
         register(newUser: $newUser) {
             code
+            message
+            errors {
+                path
+                message
+            }
         }
     }
 `
@@ -59,6 +64,7 @@ class Register extends Component {
                         <Button
                             onClick={() => this.onSubmit(register)}
                         >Submit</Button>
+                        <Label>{data && data.register && data.register.errors && JSON.stringify(data.register.errors)}</Label>
                     </Container>
                 )}
             </Mutation>
