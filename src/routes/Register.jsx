@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Input, Header, Button, Label } from 'semantic-ui-react'
+import { Message, Container, Input, Header, Button, Label } from 'semantic-ui-react'
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -35,6 +35,8 @@ class Register extends Component {
         register({ variables: { newUser: this.state } });
     }
 
+    onError = (data, name) => (data && data.register && data.register.errors && data.register.errors.find(x => x.path == name))
+
     render() {
         const { username, email, password } = this.state;
 
@@ -44,18 +46,21 @@ class Register extends Component {
                     <Container text >
                         <Header as="h2"> Register</Header>
                         <Input
+                            error={this.onError(data, 'username')}
                             onChange={this.onChange}
                             name="username"
                             value={username}
                             laceholder="username"
                             fluid />
                         <Input
+                            error={this.onError(data, 'email')}
                             onChange={this.onChange}
                             value={email}
                             name="email"
                             placeholder="email"
                             fluid />
                         <Input onChange={this.onChange}
+                            error={this.onError(data, 'password')}
                             value={password}
                             name="password"
                             placeholder="password"
@@ -64,7 +69,13 @@ class Register extends Component {
                         <Button
                             onClick={() => this.onSubmit(register)}
                         >Submit</Button>
-                        <Label>{data && data.register && data.register.errors && JSON.stringify(data.register.errors)}</Label>
+                        {data && data.register && data.register.errors &&
+                            <Message
+                                error
+                                header="There are some errors with your summisssion"
+                                list={data && data.register && data.register.errors.map(x => x.message)}
+                            />
+                        }
                     </Container>
                 )}
             </Mutation>
