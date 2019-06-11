@@ -56,8 +56,10 @@ class Login extends Component {
       return;
     }
 
-    localStorage.setItem('token', token);
-    localStorage.setItem('refreshToken', refreshToken);
+    if (token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
+    }
   }
 
 
