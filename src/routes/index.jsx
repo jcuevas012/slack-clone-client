@@ -8,7 +8,6 @@ import Register from './Register';
 import Login from './Login';
 import CreateTeam from './CreateTeam';
 
-
 function App() {
   return (
     <ApolloProvider client={client}>
