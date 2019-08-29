@@ -1,27 +1,31 @@
-import React, { Component } from 'react';
-import { Container, Input, Header, Button, Form, Message } from 'semantic-ui-react';
-import { Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
-
+import React, { Component } from 'react'
+import {
+  Container,
+  Input,
+  Header,
+  Button,
+  Form,
+  Message
+} from 'semantic-ui-react'
+import { Mutation } from 'react-apollo'
+import gql from 'graphql-tag'
 
 const LOGIN = gql`
-    mutation login($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-            code
-            message
-            token 
-            refreshToken
-            errors {
-                path
-                message
-            }
-        }
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      code
+      message
+      token
+      refreshToken
+      errors {
+        path
+        message
+      }
     }
+  }
 `
 
-
 class Login extends Component {
-
   state = {
     email: '',
     password: '',
@@ -32,56 +36,49 @@ class Login extends Component {
   }
 
   onChange = ({ target }) => {
-    const { name, value } = target;
+    const { name, value } = target
     this.setState({
       [name]: value
-    });
+    })
   }
 
-  onSubmit = (login) => {
+  onSubmit = login => {
     this.setState({ errors: {} })
-    const { email, password } = this.state;
-    login({ variables: { email, password } });
+    const { email, password } = this.state
+    login({ variables: { email, password } })
   }
 
   onCompleted = ({ login }) => {
-    const { token, refreshToken, errors: errorList } = login;
+    const { token, refreshToken, errors: errorList } = login
 
-    let errors = {};
+    let errors = {}
     if (errorList.length) {
-      errorList.forEach((error) => {
-        errors[error.path] = true;
-      });
-      this.setState({ errors });
-      return;
+      errorList.forEach(error => {
+        errors[error.path] = true
+      })
+      this.setState({ errors })
+      return
     }
 
     if (token) {
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('token', token)
+      localStorage.setItem('refreshToken', refreshToken)
     }
   }
 
-
   render() {
-    const { email, password } = this.state;
+    const { email, password } = this.state
 
     return (
-      <Mutation
-        mutation={LOGIN}
-        onCompleted={this.onCompleted}
-      >
+      <Mutation mutation={LOGIN} onCompleted={this.onCompleted}>
         {(login, { data }) => {
-          const { errors } = this.state;
+          const { errors } = this.state
 
           return (
-            <Container
-              text >
+            <Container text>
               <Header as="h2"> Login</Header>
               <Form>
-                <Form.Field
-                  error={errors.email}
-                >
+                <Form.Field error={errors.email}>
                   <Input
                     onChange={this.onChange}
                     value={email}
@@ -90,9 +87,7 @@ class Login extends Component {
                     fluid
                   />
                 </Form.Field>
-                <Form.Field
-                  error={errors.password}
-                >
+                <Form.Field error={errors.password}>
                   <Input
                     onChange={this.onChange}
                     value={password}
@@ -104,24 +99,19 @@ class Login extends Component {
                 </Form.Field>
                 <Button onClick={() => this.onSubmit(login)}>Submit</Button>
               </Form>
-              {data && data.login.code !== '200'
-                && (
-                  <Message
-                    list={data.login.errors.map(err => err.message)}
-                    error
-                    header={`${data.login.message} with your submission`}
-                  />
-                )}
+              {data && data.login.code !== '200' && (
+                <Message
+                  list={data.login.errors.map(err => err.message)}
+                  error
+                  header={`${data.login.message} with your submission`}
+                />
+              )}
             </Container>
           )
-        }
-        }
+        }}
       </Mutation>
-
     )
   }
-
 }
 
-
-export default Login;
+export default Login
