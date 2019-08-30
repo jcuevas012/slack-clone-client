@@ -17,7 +17,7 @@ const TeamList = styled.ul`
 const TeamListItem = styled.li`
   height: 50px;
   width: 50px;
-  background-color: #676066;
+  background-color: ${props => (props.selected ? 'palevioletred' : '#676066')};
   color: #fff;
   margin: auto;
   margin-bottom: 10px;
@@ -33,19 +33,22 @@ const TeamListItem = styled.li`
   }
 `
 
-const team = ({ id, name }) => {
+export default ({ teams, currentTeam }) => {
+  const team = ({ id, name }) => {
+    const letter = name
+      .toString()
+      .charAt(0)
+      .toLocaleLowerCase()
+    return (
+      <TeamListItem selected={id === currentTeam.id} key={`team-${id}`}>
+        {letter}
+      </TeamListItem>
+    )
+  }
+
   return (
-    <TeamListItem key={`team-${id}`}>
-      {name
-        .toString()
-        .charAt(0)
-        .toLocaleLowerCase()}
-    </TeamListItem>
+    <TeamWrapper>
+      <TeamList>{teams.map(team)}</TeamList>
+    </TeamWrapper>
   )
 }
-
-export default ({ teams }) => (
-  <TeamWrapper>
-    <TeamList>{teams.map(team)}</TeamList>
-  </TeamWrapper>
-)
