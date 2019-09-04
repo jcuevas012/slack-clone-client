@@ -17,7 +17,7 @@ const TeamList = styled.ul`
 const TeamListItem = styled.li`
   height: 50px;
   width: 50px;
-  background-color: ${props => (props.selected ? 'palevioletred' : '#676066')};
+  background-color: ${props => (props.selected ? '#4E394C; ' : '#676066')};
   color: #fff;
   margin: auto;
   margin-bottom: 10px;
@@ -26,6 +26,7 @@ const TeamListItem = styled.li`
   justify-content: center;
   font-size: 24px;
   border-radius: 11px;
+
   &:hover {
     border-style: solid;
     border-width: thick;

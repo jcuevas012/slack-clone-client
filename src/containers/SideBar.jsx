@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
-import * as team from '../context/team'
 import Teams from '../components/Teams'
 import Channels from '../components/Channels'
 
@@ -24,26 +23,29 @@ const allTeamQuery = gql`
   }
 `
 
-const SideBar = () => {
-  const { state, dispatch } = useContext(team.context)
-
+const SideBar = ({ currentTeamId, currentChannelId }) => {
   return (
     <Query query={allTeamQuery}>
       {({ data, loading, error }) => {
         if (loading) return <p> Loading ...</p>
         if (error) return <p> {error.message} </p>
 
-        const { currentTeam } = state
-        const team = data.teams.find(t => t.name === currentTeam.name)
+        const currentTeam =
+          data.teams.find(t => t.id === currentTeamId) || data.teams[0]
+
+        const currentChannel =
+          currentTeam.channels.find(c => c.id === currentChannelId) ||
+          currentTeam.channels[0]
 
         return (
           <>
-            <Teams teams={data.teams} currentTeam={team} />
+            <Teams teams={data.teams} currentTeam={currentTeam} />
             <Channels
               members={[{ id: 1, name: 'Juan' }, { id: 1, name: 'Pedro' }]}
-              channels={team.channels}
+              channels={currentTeam.channels}
+              currentChannel={currentChannel}
               user={{ id: 1, name: 'Jose', username: 'juan20' }}
-              team={team}
+              team={currentTeam}
             />
           </>
         )
