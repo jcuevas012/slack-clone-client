@@ -1,6 +1,7 @@
 import React from 'react'
 import PropsType from 'prop-types'
 import styled from 'styled-components'
+import { Icon } from 'semantic-ui-react'
 
 const PADDING_LEFT = 'padding-left: 10px'
 
@@ -50,7 +51,14 @@ const member = ({ id, name }) => (
   </SideBarListItem>
 )
 
-const Channels = ({ team, user, channels, members, currentChannel }) => {
+const Channels = ({
+  team,
+  user,
+  channels,
+  members,
+  currentChannel,
+  onChannelAdd
+}) => {
   const channel = ({ id, name }) => (
     <SideBarListItem
       selected={currentChannel && currentChannel.id === id}
@@ -68,7 +76,14 @@ const Channels = ({ team, user, channels, members, currentChannel }) => {
       </PushLeft>
       <div>
         <SideBarList>
-          <SideBarListHeader>Channels</SideBarListHeader>
+          <SideBarListHeader>
+            Channels
+            <Icon
+              style={{ marginLeft: '10px' }}
+              onClick={onChannelAdd}
+              name="add circle"
+            />
+          </SideBarListHeader>
           {channels.map(channel)}
         </SideBarList>
       </div>
@@ -83,11 +98,12 @@ const Channels = ({ team, user, channels, members, currentChannel }) => {
 }
 
 Channels.propTypes = {
-  members: PropsType.array,
-  channels: PropsType.array,
-  user: PropsType.object,
-  team: PropsType.object,
-  currentChannel: PropsType.object
+  members: PropsType.arrayOf(PropsType.object).isRequired,
+  channels: PropsType.arrayOf(PropsType.object).isRequired,
+  user: PropsType.object.isRequired,
+  team: PropsType.object.isRequired,
+  currentChannel: PropsType.object,
+  onChannelAdd: PropsType.func
 }
 
 export default Channels

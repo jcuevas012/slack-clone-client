@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
 const TeamWrapper = styled.div`
   grid-column: 1;
@@ -34,16 +36,16 @@ const TeamListItem = styled.li`
   }
 `
 
-export default ({ teams, currentTeam }) => {
+const Teams = ({ teams, currentTeam }) => {
   const team = ({ id, name }) => {
     const letter = name
       .toString()
       .charAt(0)
       .toLocaleLowerCase()
     return (
-      <TeamListItem selected={id === currentTeam.id} key={`team-${id}`}>
-        {letter}
-      </TeamListItem>
+      <Link key={`team-${id}`} to={`/view-team/${id}`}>
+        <TeamListItem selected={id === currentTeam.id}>{letter}</TeamListItem>
+      </Link>
     )
   }
 
@@ -53,3 +55,10 @@ export default ({ teams, currentTeam }) => {
     </TeamWrapper>
   )
 }
+
+Teams.protoType = {
+  teams: PropTypes.arrayOf(PropTypes.object).isRequired,
+  currentTeam: PropTypes.object
+}
+
+export default Teams

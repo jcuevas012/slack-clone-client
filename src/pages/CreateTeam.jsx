@@ -15,6 +15,9 @@ const CREATE_TEAM = gql`
     createTeam(name: $name) {
       code
       message
+      team {
+        id
+      }
       errors {
         path
         message
@@ -45,7 +48,10 @@ class CreateTeam extends Component {
   }
 
   onCompleted = ({ createTeam }) => {
-    const { errors: errorList } = createTeam
+    const { errors: errorList, team, code } = createTeam
+    if (code === '200') {
+      this.props.history.push(`/view-team/${team.id}`)
+    }
   }
 
   render() {

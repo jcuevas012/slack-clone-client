@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { ApolloProvider } from 'react-apollo'
+import { ApolloProvider } from '@apollo/react-hooks'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import client from '../apollo'
 import * as team from '../context/team'
