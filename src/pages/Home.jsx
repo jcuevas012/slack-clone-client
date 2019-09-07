@@ -1,5 +1,5 @@
 import React from 'react'
-import { Query } from 'react-apollo'
+import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 
 const allUserQuery = gql`
@@ -11,19 +11,22 @@ const allUserQuery = gql`
   }
 `
 
-const Home = () => (
-  <Query query={allUserQuery}>
-    {({ data, loading, error }) => {
-      if (loading) return <p> Loading ...</p>
-      if (error) return <p> {error.message} </p>
+const Home = () => {
+  const { data, loading, error } = useQuery(allUserQuery)
 
-      return (
-        <div>
-          <h1>{JSON.stringify(data.allUsers)}</h1>
-        </div>
-      )
-    }}
-  </Query>
-)
+  if (loading) {
+    return <p> Loading ...</p>
+  }
+
+  if (error) {
+    return <p> {error.message} </p>
+  }
+
+  return (
+    <div>
+      <h1>{JSON.stringify(data.allUsers)}</h1>
+    </div>
+  )
+}
 
 export default Home

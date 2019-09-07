@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import {
   Container,
   Input,
@@ -7,7 +7,7 @@ import {
   Form,
   Message
 } from 'semantic-ui-react'
-import { Mutation } from 'react-apollo'
+import { useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 
 const LOGIN = gql`
@@ -25,93 +25,80 @@ const LOGIN = gql`
   }
 `
 
-class Login extends Component {
-  state = {
+const Login = ({ history }) => {
+  const [login, { data, loading }] = useMutation(LOGIN)
+
+  const [payload, setPayload] = useState({
     email: '',
-    password: '',
-    errors: {
-      email: false,
-      password: false
-    }
-  }
+    password: ''
+  })
 
-  onChange = ({ target }) => {
+  const [errors, setErrors] = useState({
+    email: false,
+    password: false
+  })
+
+  function onChange({ target }) {
     const { name, value } = target
-    this.setState({
-      [name]: value
-    })
+    let state = { ...payload }
+    state[name] = value
+    setPayload(state)
   }
 
-  onSubmit = login => {
-    this.setState({ errors: {} })
-    const { email, password } = this.state
-    login({ variables: { email, password } })
-  }
+  async function onSubmit() {
+    const { email, password } = payload
+    await login({ variables: { email, password } })
 
-  onCompleted = ({ login }) => {
-    const { token, refreshToken, errors: errorList } = login
-
-    let errors = {}
-    if (errorList.length) {
-      errorList.forEach(error => {
-        errors[error.path] = true
+    if (data && data.login.code !== '200') {
+      let error = {}
+      data.login.errors.forEach((err, i) => {
+        error[err.path] = true
       })
-      this.setState({ errors })
+      setErrors(error)
       return
     }
 
-    if (token) {
-      localStorage.setItem('token', token)
-      localStorage.setItem('refreshToken', refreshToken)
+    if (data && data.login.token) {
+      localStorage.setItem('token', data.login.token)
+      localStorage.setItem('refreshToken', data.login.refreshToken)
+      history.push('/view-team')
     }
   }
 
-  render() {
-    const { email, password } = this.state
-
-    return (
-      <Mutation mutation={LOGIN} onCompleted={this.onCompleted}>
-        {(login, { data }) => {
-          const { errors } = this.state
-
-          return (
-            <Container text>
-              <Header as="h2"> Login</Header>
-              <Form>
-                <Form.Field error={errors.email}>
-                  <Input
-                    onChange={this.onChange}
-                    value={email}
-                    name="email"
-                    placeholder="Email"
-                    fluid
-                  />
-                </Form.Field>
-                <Form.Field error={errors.password}>
-                  <Input
-                    onChange={this.onChange}
-                    value={password}
-                    name="password"
-                    placeholder="Password"
-                    type="password"
-                    fluid
-                  />
-                </Form.Field>
-                <Button onClick={() => this.onSubmit(login)}>Submit</Button>
-              </Form>
-              {data && data.login.code !== '200' && (
-                <Message
-                  list={data.login.errors.map(err => err.message)}
-                  error
-                  header={`${data.login.message} with your submission`}
-                />
-              )}
-            </Container>
-          )
-        }}
-      </Mutation>
-    )
-  }
+  return (
+    <Container text>
+      <Header as="h2"> Login</Header>
+      <Form>
+        <Form.Field error={errors.email}>
+          <Input
+            onChange={onChange}
+            value={payload.email}
+            name="email"
+            placeholder="Email"
+            fluid
+          />
+        </Form.Field>
+        <Form.Field error={errors.password}>
+          <Input
+            onChange={onChange}
+            value={payload.password}
+            name="password"
+            placeholder="Password"
+            type="password"
+            fluid
+          />
+        </Form.Field>
+        <Button onClick={onSubmit}>{loading ? 'Sending ...' : 'Submit'}</Button>
+      </Form>
+      {data && data.login.code !== '200' && (
+        <Message
+          list={data.login.errors.map(err => err.message)}
+          error
+          header={`${data.login.message} with your submission`}
+        />
+      )}
+    </Container>
+  )
 }
 
 export default Login
