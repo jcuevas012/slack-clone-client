@@ -1,8 +1,10 @@
-import React from 'react'
-import { useMutation, useQuery } from '@apollo/react-hooks'
+import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import Teams from '../components/Teams'
+import React, { useState } from 'react'
+
+import AddChannelModal from '../components/AddChannelModal'
 import Channels from '../components/Channels'
+import Teams from '../components/Teams'
 
 const allTeamQuery = gql`
   {
@@ -25,6 +27,8 @@ const allTeamQuery = gql`
 
 const SideBar = ({ currentTeamId, currentChannelId }) => {
   const { loading, error, data } = useQuery(allTeamQuery)
+  const [showAddChannel, setShowAddChannel] = useState(false)
+
 
   if (loading) {
     return <p> Loading ...</p>
@@ -50,7 +54,9 @@ const SideBar = ({ currentTeamId, currentChannelId }) => {
         currentChannel={currentChannel}
         user={{ id: 1, name: 'Jose', username: 'juan20' }}
         team={currentTeam}
+        onChannelAdd={() => setShowAddChannel(true)}
       />
+      <AddChannelModal show={showAddChannel} onClose={() => setShowAddChannel(false)} />
     </>
   )
 }

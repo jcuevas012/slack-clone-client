@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import {
-  Container,
-  Input,
-  Header,
-  Button,
-  Form,
-  Message
-} from 'semantic-ui-react'
 import { useMutation } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
+import React, { useState } from 'react'
+import {
+  Button,
+  Container,
+  Form,
+  Header,
+  Input,
+  Message
+} from 'semantic-ui-react'
 
 const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
@@ -25,22 +25,44 @@ const LOGIN = gql`
   }
 `
 
+
 const Login = ({ history }) => {
-  const [login, { data, loading }] = useMutation(LOGIN)
+
+
 
   const [payload, setPayload] = useState({
     email: '',
     password: ''
   })
 
+
   const [errors, setErrors] = useState({
     email: false,
     password: false
   })
 
+  const [login, { data, loading }] = useMutation(LOGIN, {
+    onCompleted: (data) => {
+      if (data.login.code !== '200') {
+        const error = {}
+        data.login.errors.forEach((err, i) => {
+          error[err.path] = true
+        })
+        setErrors(error)
+        return
+      }
+
+      if (data && data.login.token) {
+        localStorage.setItem('token', data.login.token)
+        localStorage.setItem('refreshToken', data.login.refreshToken)
+        history.push('/view-team')
+      }
+    }
+  })
+
   function onChange({ target }) {
     const { name, value } = target
-    let state = { ...payload }
+    const state = { ...payload }
     state[name] = value
     setPayload(state)
   }
@@ -48,21 +70,6 @@ const Login = ({ history }) => {
   async function onSubmit() {
     const { email, password } = payload
     await login({ variables: { email, password } })
-
-    if (data && data.login.code !== '200') {
-      let error = {}
-      data.login.errors.forEach((err, i) => {
-        error[err.path] = true
-      })
-      setErrors(error)
-      return
-    }
-
-    if (data && data.login.token) {
-      localStorage.setItem('token', data.login.token)
-      localStorage.setItem('refreshToken', data.login.refreshToken)
-      history.push('/view-team')
-    }
   }
 
   return (
